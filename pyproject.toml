@@ -1,0 +1,15 @@
+[project]
+name = "cudiff"
+version = "0.1.0"
+description = "Differential testing of the CUDA compiler on UB-free integer kernels: nvcc at several device optimisation levels versus a CPU reference."
+requires-python = ">=3.8"
+dependencies = []
+
+[project.scripts]
+cudiff = "cudiff.cli:main"
+
+[tool.setuptools]
+packages = ["cudiff"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
