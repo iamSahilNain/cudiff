@@ -17,6 +17,8 @@ def main(argv=None) -> int:
     sub = ap.add_subparsers(dest="cmd", required=True)
     p = sub.add_parser("configs")
     p = sub.add_parser("gen"); p.add_argument("--seed", type=int, default=1)
+    p = sub.add_parser("ptx", help="emit PTX at -G and optimised for one kernel and compare instruction mixes")
+    p.add_argument("--seed", type=int, default=1); p.add_argument("--out", default="results/ptx")
     p = sub.add_parser("run")
     p.add_argument("-n", type=int, default=100); p.add_argument("--seed", type=int, default=1)
     p.add_argument("--out", default="results/latest"); p.add_argument("--jobs", type=int, default=4)
@@ -29,6 +31,20 @@ def main(argv=None) -> int:
         return 0
     if a.cmd == "gen":
         sys.stdout.write(kernel(a.seed).source); return 0
+    if a.cmd == "ptx":
+        from .ptx import compare as ptx_compare
+        k = kernel(a.seed)
+        d = os.path.join(a.out, f"k{a.seed}")
+        g, o, gp, op_ = ptx_compare(k, keep_dir=d)
+        keys = sorted(set(g) | set(o), key=lambda x: -(g.get(x, 0) + o.get(x, 0)))
+        print(f"{'op':10s} {'-G':>6s} {'opt':>6s}")
+        for key in keys:
+            if key.startswith("_"):
+                continue
+            print(f"{key:10s} {g.get(key, 0):6d} {o.get(key, 0):6d}")
+        print(f"{'total':10s} {g['_total']:6d} {o['_total']:6d}")
+        json.dump({"seed": a.seed, "G": g, "opt": o, "files": [gp, op_]}, open(os.path.join(d, "summary.json"), "w"), indent=2)
+        return 0
     if a.cmd == "run":
         cfgs = default_configs()
         os.makedirs(os.path.join(a.out, "candidates"), exist_ok=True)

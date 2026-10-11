@@ -64,3 +64,15 @@ See `results/README.md`.
 * Finding a bug in a release CUDA toolkit with a few thousand kernels is
   unlikely; the harness and its self-verification are the deliverable, and
   campaign counts are reported as they come out.
+
+## PTX inspection
+
+```
+python -m cudiff ptx --seed 3        # nvcc -ptx at -G and optimised; instruction mix side by side
+```
+
+Writes both PTX files and a `summary.json` under `results/ptx/k<seed>/`. At `-G`
+the `compute()` body stays a separate `.func` and every temporary goes through
+local memory (`ld.local`/`st.local`); optimised, it is inlined into the entry
+and the arithmetic sits in registers. Reading the two side by side is the
+fastest way to see what NVVM did before ptxas ran.
