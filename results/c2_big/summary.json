@@ -1,0 +1,19 @@
+{
+  "n": 300,
+  "seed": 200000,
+  "stmts": 24,
+  "configs": [
+    "cpu-O0",
+    "cpu-O2",
+    "nvcc-G",
+    "nvcc-ptxas-O0",
+    "nvcc-ptxas-O1",
+    "nvcc-ptxas-O2",
+    "nvcc-ptxas-O3"
+  ],
+  "counts": {
+    "agree": 300
+  },
+  "seconds": 561.2,
+  "candidates": []
+}
